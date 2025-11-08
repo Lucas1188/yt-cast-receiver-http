@@ -38,16 +38,16 @@ npm run http-player
 
 ```bash
 docker build -t yt-cast-receiver-http .
-docker run -p 6969:6969 yt-cast-receiver-http
+docker run -p 6969:6969 yt-cast-receiver-http --name "Unholycast Device" --port 6969
 ```
 
-The service will start an HTTP listener (default: port `6969`) exposing endpoints for player position, transport control, and status polling.
+The service will **poll** a HTTP listener (default: port `6969`) exposing endpoints for player position, transport control, and player status.
 
 ---
 
 ## 🔗 Integration
 
-This project is used as a submodule of **UnholyCast**, where it provides the “HTTP player” backend.
+This project is part of [**UnholyCast**](https://github.com/lucas1188/unholycast), where it provides the “HTTP player” backend.
 You can integrate it with your own backend by implementing a compatible REST API that exposes:
 
 | Endpoint    | Method | Description                             |
