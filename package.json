@@ -10,7 +10,8 @@
     "lint:fix": "npx eslint ./src --fix && npx eslint ./example --fix",
     "doc": "npx typedoc",
     "example": "npx tsx ./example/index.ts",
-    "example:no-ui": "npx tsx ./example/index.ts --no-ui"
+    "example:no-ui": "npx tsx ./example/index.ts --no-ui",
+    "http-player": "npx tsx ./httpplayer/index.ts"
   },
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -1,0 +1,317 @@
+import { Timer } from 'timer-node';
+import { Player, type PlayerState, PLAYER_STATUSES, type Volume } from '../dist/index.js';
+import type Video from '../dist/lib/app/Video.js';
+import VideoLoader from './VideoLoader.js';
+import { PlayerStatus } from 'yt-cast-receiver';
+import type { TransportState,TransportStatus } from './SonosTransport.js';
+import { SonosTransportStatus } from './SonosTransport.js';
+
+export interface FakeState {
+  status: number;
+  videoTitle: string;
+  position: number;
+  duration: number;
+  volume: Volume;
+}
+
+/**
+ * Custom implementation of {@link Player} for use with {@link FakePlayerDemo}.
+ * Uses a timer to simulate playback and [YouTube.js](https://github.com/LuanRT/YouTube.js)
+ * for fetching video info (see {@link VideoLoader}).
+ */
+export default class HttpPlayer extends Player {
+
+  videoLoader: VideoLoader;
+  currentVideoId: string | null;
+  currentVideoTitle: string | null;
+  timer: Timer;
+  seekOffset: number;
+  duration: number;
+  timeout: NodeJS.Timeout | null;
+  volume: Volume;
+  loadTimeout:number;
+  port:number;
+  url:string|"http://localhost:6969";
+
+  constructor(port:number) {
+    super();
+    this.videoLoader = new VideoLoader();
+    this.currentVideoId = null;
+    this.currentVideoTitle = null;
+    this.timer = new Timer();
+    this.seekOffset = 0;
+    this.duration = 0;
+    this.timeout = null;
+    this.volume = {
+      level: 50,
+      muted: false
+    };
+    this.loadTimeout = 5;
+    this.port = port;
+    this.url = `http://localhost:${this.port}`;
+    // When we receive a `state` event from the super class, signalling a change
+    // In player state, we emit our own `fakeState` event for `FakeDemoPlayer` to consume.
+    this.on('state', this.#emitFakeState.bind(this));
+  }
+
+  protected doPlay(video: Video, position: number): Promise<boolean> {
+    this.logger.info(`[FakePlayer]: Play ${video.id} at position ${position}s`);
+    return this.#fakePlay(video, position);
+  }
+
+  protected doPause(): Promise<boolean> {
+    this.logger.info('[FakePlayer]: Pause');
+    return this.#fakePause();
+  }
+
+  protected doResume(): Promise<boolean> {
+    this.logger.info('[FakePlayer]: Resume');
+    return this.#fakeResume();
+  }
+
+  protected doStop(): Promise<boolean> {
+    this.logger.info('[FakePlayer]: Stop');
+    return this.#fakeStop();
+  }
+
+  protected doSeek(position: number): Promise<boolean> {
+    this.logger.info(`[FakePlayer]: Seek to ${position}s`);
+    return this.#fakeSeek(position);
+  }
+
+  protected async doSetVolume(volume: Volume): Promise<boolean> {
+  try {
+    this.logger.info(`[FakePlayer]: Trying to set volume ${volume}`);
+    const res = await fetch(`${this.url}/volume`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        level: volume.level,
+        muted: volume.muted
+      })
+    });
+
+    if (!res.ok) throw new Error(`Failed to set volume: ${res.status}`);
+    this.volume = volume;
+    return true;
+  } catch (err) {
+    this.logger.error(`[FakePlayer] doSetVolume error: ${err}`);
+    return false;
+  }
+}
+
+protected async doGetVolume(): Promise<Volume> {
+  try {
+    const res = await fetch(`${this.url}/volume`);
+    if (!res.ok) throw new Error(`Failed to get volume: ${res.status}`);
+    const data = await res.json();
+    this.volume = {
+      level: data.level,
+      muted: data.muted
+    };
+    return this.volume;
+  } catch (err) {
+    this.logger.error(`[FakePlayer] doGetVolume error: ${err}`);
+    // fallback to last known volume
+    return this.volume;
+  }
+}
+protected async doGetPosition(): Promise<number> {
+  try {
+    const res = await fetch(`${this.url}/position`);
+    if (!res.ok) throw new Error(`Failed to get position: ${res.status}`);
+    const data = await res.json();
+    this.logger.info(`[FakePlayer] doGetPositon Got ${data.position} | >> `);
+    // The backend returns playback position in seconds
+    const stateMap: Record<TransportState,number> = {
+      'TRANSITIONING': PLAYER_STATUSES.LOADING,
+      'PLAYING': PLAYER_STATUSES.PLAYING,
+      'PAUSED_PLAYBACK': PLAYER_STATUSES.PAUSED,
+      'STOPPED': PLAYER_STATUSES.STOPPED,
+    };
+    const transport_state = data.status as SonosTransportStatus;
+    // Suppose `data.status.current_transport_state` = "PLAYING"
+    const newState = stateMap[transport_state.current_transport_state] || undefined;
+
+    // Update only if changed
+    if(newState){
+      if (this.status !== newState) {
+        if(newState === PLAYER_STATUSES.LOADING && this.loadTimeout>=0){
+          this.loadTimeout-=0.5;
+          setTimeout(async ()=>{
+            await this.doGetPosition()
+          },500);
+        }
+        if(newState === PLAYER_STATUSES.LOADING && this.loadTimeout<0){
+          this.doStop()
+          this.notifyExternalStateChange(PLAYER_STATUSES.STOPPED)
+        }
+        this.notifyExternalStateChange(newState as PlayerStatus)
+      }
+    }
+    else{
+      this.notifyExternalStateChange()
+    }
+
+    return data.position ?? (this.seekOffset + Math.floor(this.timer.ms() / 1000));
+  } catch (err) {
+    this.logger.error(`[FakePlayer] doGetPosition error: ${err}`);
+    // fallback to locally simulated timer
+    return this.seekOffset + Math.floor(this.timer.ms() / 1000);
+  }
+}
+
+protected async doGetDuration(): Promise<number> {
+  try {
+    const res = await fetch(`${this.url}/duration`);
+    if (!res.ok) throw new Error(`Failed to get duration: ${res.status}`);
+    const data = await res.json();
+    this.duration = data.duration ?? this.duration;
+    return this.duration;
+  } catch (err) {
+    this.logger.error(`[FakePlayer] doGetDuration error: ${err}`);
+    return this.duration;
+  }
+}
+
+  async #fakeResume() {
+    try {
+      const res = await fetch(`${this.url}/resume`,{method:'GET'});
+      if (!res.ok) throw new Error('Resume failed');
+      this.timer.resume();
+      this.#startTimeout(this.duration - this.seekOffset);
+      return true;
+    } catch (err) {
+      this.logger.error(`[FakePlayer] #fakeResume error: ${err}`);
+      return false;
+    }
+  }
+
+  async #fakePlay(video: Video, position: number) {
+
+    this.seekOffset = position;
+    this.timer.stop();
+    this.#resetTimeout();
+
+    try {
+      const info = await this.videoLoader.getInfo(video);
+      if (!info) throw new Error(`Failed to retrieve info for ${video.id}`);
+
+      const params = new URLSearchParams({
+        videoId: String(video.id),
+        title: String(info.title),
+        duration: String(info.duration),
+        position: String(position),
+        streamUrl: String(info.streamUrl),
+        src: String(info.src || ""),
+        channel: String(info.channel || ""),
+        artist: String(info.artist || ""),
+        album: String(info.album || "")
+      });
+      
+      const res = await fetch(`${this.url}/start?${params.toString()}`, {
+        method: 'GET'
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      const data = await res.json();
+
+      const duration = info.duration || 0;
+      this.currentVideoId = video.id;
+      this.currentVideoTitle = info.title;
+      this.timer.start();
+      this.#startTimeout(this.duration - this.seekOffset);
+      this.duration = duration;
+      return true;
+    }catch (err) {
+      this.logger.error(`[FakePlayer] #fakePlay error: ${err}`);
+      return false;
+    }
+  }
+
+  async #fakePause() {
+    try {
+      this.logger.info("[FakePlayer] Calling PAUSE endpoint")
+      const res = await fetch(`${this.url}/pause`,{method:'GET'});
+      if (!res.ok) throw new Error('Pause failed');
+      this.timer.pause();
+      this.#resetTimeout();
+      return true;
+    } catch (err) {
+      this.logger.error(`[FakePlayer] #fakePause error: ${err}`);
+      return false;
+    }
+  }
+
+  async #fakeStop() {
+    try {
+      const res = await fetch(`${this.url}/stop`,{method:'GET'});
+      if (!res.ok) throw new Error('Stop failed');
+      this.seekOffset = 0;
+      this.timer.stop().clear();
+      this.#resetTimeout();
+      return true;
+    } catch (err) {
+      this.logger.error(`[FakePlayer] #fakeStop error: ${err}`);
+      return false;
+    }
+  }
+
+  async #fakeSeek(position: number) {
+    try {
+      const res = await fetch(`${this.url}/seek?pos=${position}`,{method:'GET'});
+      if (!res.ok) throw new Error('Seek failed');
+      this.timer.stop().clear();
+      this.seekOffset = position;
+      this.#resetTimeout();
+      if (this.status === PLAYER_STATUSES.PLAYING) {
+        return await this.#fakeResume();
+      }
+      return true;
+    } catch (err) {
+      this.logger.error(`[FakePlayer] #fakeSeek error: ${err}`);
+      return false;
+    }
+  }
+
+  #resetTimeout() {
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    }
+  }
+
+  #startTimeout(duration: number) {
+    this.logger.info(`[FAKEPLAYER FAKEPLAYER FAKEPLAYER] ||| timeout: ${duration}`)
+    this.#resetTimeout();
+    this.timeout = setTimeout(() => {
+      void (async () => {
+        await this.pause();
+        this.seekOffset = 0;
+        this.timer.stop().clear();
+        this.logger.info('[FakePlayer] Playback ended. Moving to next in list...');
+        await this.next();
+      })();
+    }, (duration + 1) * 1000);
+  }
+
+  #emitFakeState() {
+    void (async () => {
+      this.emit('fakeState', {
+        status: this.status,
+        videoId: this.currentVideoId,
+        videoTitle: this.currentVideoTitle,
+        duration: await this.getDuration(),
+        position: await this.getPosition(),
+        volume: await this.getVolume()
+      });
+    })();
+  }
+
+  on(event: 'fakeState', listener: (data: FakeState) => void): this;
+  on(event: 'state', listener: (data: {AID: string, current: PlayerState, previous: PlayerState | null}) => void): this;
+  on(event: string | symbol, listener: (...args: any[]) => void): this {
+    super.on(event, listener);
+    return this;
+  }
+}
