@@ -272,6 +272,7 @@ protected async doGetDuration(): Promise<number> {
       this.timer.stop().clear();
       this.seekOffset = position;
       this.#resetTimeout();
+      this.#startTimeout(this.duration-position)
       // if (this.status === PLAYER_STATUSES.PLAYING) {
       //   return await this.#fakeResume();
       // }
@@ -290,17 +291,16 @@ protected async doGetDuration(): Promise<number> {
   }
 
   #startTimeout(duration: number) {
-    this.logger.info(`[FAKEPLAYER FAKEPLAYER FAKEPLAYER] ||| timeout: ${duration}`)
+    this.logger.info(`[FAKEPLAYER] ||| timeout set for: ${duration}`)
     this.#resetTimeout();
     this.timeout = setTimeout(() => {
       void (async () => {
-        await this.pause();
         this.seekOffset = 0;
         this.timer.stop().clear();
         this.logger.info('[FakePlayer] Playback ended. Moving to next in list...');
         await this.next();
       })();
-    }, (duration + 1) * 1000);
+    }, (duration) * 1000);
   }
 
   #emitFakeState() {
