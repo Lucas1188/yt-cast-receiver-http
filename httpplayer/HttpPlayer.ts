@@ -32,7 +32,18 @@ export default class HttpPlayer extends Player {
   loadTimeout:number;
   port:number;
   url:string|"http://localhost:6969";
-
+  stateMap: Record<TransportState,number> = {
+      'TRANSITIONING': PLAYER_STATUSES.LOADING,
+      'PLAYING': PLAYER_STATUSES.PLAYING,
+      'PAUSED_PLAYBACK': PLAYER_STATUSES.PAUSED,
+      'STOPPED': PLAYER_STATUSES.STOPPED,
+    };
+  stateMap0:Record<number,TransportState> ={
+      3:'TRANSITIONING',
+      1:'PLAYING',
+      2:'PAUSED_PLAYBACK',
+      4:'STOPPED'
+  };
   constructor(port:number) {
     super();
     this.videoLoader = new VideoLoader();
@@ -123,15 +134,10 @@ protected async doGetPosition(): Promise<number> {
     const data = await res.json();
     this.logger.info(`[FakePlayer] doGetPositon Got ${data.position} | >> `);
     // The backend returns playback position in seconds
-    const stateMap: Record<TransportState,number> = {
-      'TRANSITIONING': PLAYER_STATUSES.LOADING,
-      'PLAYING': PLAYER_STATUSES.PLAYING,
-      'PAUSED_PLAYBACK': PLAYER_STATUSES.PAUSED,
-      'STOPPED': PLAYER_STATUSES.STOPPED,
-    };
+    
     const transport_state = data.status as SonosTransportStatus;
     // Suppose `data.status.current_transport_state` = "PLAYING"
-    const newState = stateMap[transport_state.current_transport_state] || undefined;
+    const newState = this.stateMap[transport_state.current_transport_state] || undefined;
 
     // Update only if changed
     if(newState){
@@ -213,15 +219,15 @@ protected async doGetDuration(): Promise<number> {
         method: 'GET'
       });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}::${await res.text()}`);
       const data = await res.json();
 
       const duration = info.duration || 0;
       this.currentVideoId = video.id;
       this.currentVideoTitle = info.title;
       this.timer.start();
-      this.#startTimeout(this.duration - this.seekOffset);
       this.duration = duration;
+      this.#startTimeout(this.duration - this.seekOffset);
       return true;
     }catch (err) {
       this.logger.error(`[FakePlayer] #fakePlay error: ${err}`);
@@ -259,14 +265,16 @@ protected async doGetDuration(): Promise<number> {
 
   async #fakeSeek(position: number) {
     try {
-      const res = await fetch(`${this.url}/seek?pos=${position}`,{method:'GET'});
-      if (!res.ok) throw new Error('Seek failed');
+      const res = await fetch(`${this.url}/seek?pos=${position}&state=${this.stateMap0[this.status]}`,{method:'GET'});
+      if (!res.ok) throw new Error(`Seek failed: ${await res.text()}`);
+      const data = await res.json();
+      this.notifyExternalStateChange(this.stateMap[(data.status as SonosTransportStatus).current_transport_state] as PlayerStatus);
       this.timer.stop().clear();
       this.seekOffset = position;
       this.#resetTimeout();
-      if (this.status === PLAYER_STATUSES.PLAYING) {
-        return await this.#fakeResume();
-      }
+      // if (this.status === PLAYER_STATUSES.PLAYING) {
+      //   return await this.#fakeResume();
+      // }
       return true;
     } catch (err) {
       this.logger.error(`[FakePlayer] #fakeSeek error: ${err}`);
