@@ -29,7 +29,6 @@ export default class HttpPlayer extends Player {
   duration: number;
   timeout: NodeJS.Timeout | null;
   volume: Volume;
-  loadTimeout:number;
   port:number;
   url:string|"http://localhost:6969";
   stateMap: Record<TransportState,number> = {
@@ -57,7 +56,6 @@ export default class HttpPlayer extends Player {
       level: 50,
       muted: false
     };
-    this.loadTimeout = 5;
     this.port = port;
     this.url = `http://localhost:${this.port}`;
     // When we receive a `state` event from the super class, signalling a change
@@ -133,32 +131,19 @@ protected async doGetPosition(): Promise<number> {
     if (!res.ok) throw new Error(`Failed to get position: ${res.status}`);
     const data = await res.json();
     this.logger.info(`[FakePlayer] doGetPositon Got ${data.position} | >> `);
-    // The backend returns playback position in seconds
-    
+    // The backend returns playback position in seconds    
     const transport_state = data.status as SonosTransportStatus;
-    // Suppose `data.status.current_transport_state` = "PLAYING"
     const newState = this.stateMap[transport_state.current_transport_state] || undefined;
-
-    // Update only if changed
+    
     if(newState){
       if (this.status !== newState) {
-        if(newState === PLAYER_STATUSES.LOADING && this.loadTimeout>=0){
-          this.loadTimeout-=0.5;
-          setTimeout(async ()=>{
-            await this.doGetPosition()
-          },500);
-        }
-        if(newState === PLAYER_STATUSES.LOADING && this.loadTimeout<0){
-          this.doStop()
-          this.notifyExternalStateChange(PLAYER_STATUSES.STOPPED)
-        }
         this.notifyExternalStateChange(newState as PlayerStatus)
       }
     }
     else{
       this.notifyExternalStateChange()
     }
-
+    
     return data.position ?? (this.seekOffset + Math.floor(this.timer.ms() / 1000));
   } catch (err) {
     this.logger.error(`[FakePlayer] doGetPosition error: ${err}`);
@@ -273,9 +258,6 @@ protected async doGetDuration(): Promise<number> {
       this.seekOffset = position;
       this.#resetTimeout();
       this.#startTimeout(this.duration-position)
-      // if (this.status === PLAYER_STATUSES.PLAYING) {
-      //   return await this.#fakeResume();
-      // }
       return true;
     } catch (err) {
       this.logger.error(`[FakePlayer] #fakeSeek error: ${err}`);
