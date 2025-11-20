@@ -130,11 +130,11 @@ protected async doGetPosition(): Promise<number> {
     const res = await fetch(`${this.url}/position`);
     if (!res.ok) throw new Error(`Failed to get position: ${res.status}`);
     const data = await res.json();
-    this.logger.info(`[FakePlayer] doGetPositon Got ${data.position} | >> `);
     // The backend returns playback position in seconds    
     const transport_state = data.status as SonosTransportStatus;
     const newState = this.stateMap[transport_state.current_transport_state] || undefined;
-    
+    this.logger.info(`[FakePlayer] doGetPositon Got ${data.position} | >> ${newState}`);
+
     if(newState){
       if (this.status !== newState) {
         this.notifyExternalStateChange(newState as PlayerStatus)
@@ -199,14 +199,25 @@ protected async doGetDuration(): Promise<number> {
         artist: String(info.artist || ""),
         album: String(info.album || "")
       });
-      
-      const res = await fetch(`${this.url}/start?${params.toString()}`, {
-        method: 'GET'
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}::${await res.text()}`);
-      const data = await res.json();
-
+      var retry = 3;
+      while(retry>0){
+          const res = await fetch(`${this.url}/start?${params.toString()}`, {
+           method: 'GET'
+          });
+          
+          if (!res.ok)
+          {
+            if(retry==0)
+            {
+              throw new Error(`HTTP ${res.status}: ${res.statusText}::${await res.text()}`);
+            }
+            retry-=1;
+            await new Promise(resolve=> setTimeout(resolve,2000)); 
+          }else{
+            break;
+          }
+      }
+      this.logger.info(`[FakePlayer] #fakePlay Playing ${params.toString()}`);
       const duration = info.duration || 0;
       this.currentVideoId = video.id;
       this.currentVideoTitle = info.title;
