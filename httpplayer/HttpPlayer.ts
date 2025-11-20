@@ -178,6 +178,7 @@ protected async doGetDuration(): Promise<number> {
       if (!res.ok) throw new Error('Resume failed');
       this.timer.resume();
       this.#startTimeout(this.duration - this.seekOffset);
+      this.#startPoller(1);
       return true;
     } catch (err) {
       this.logger.error(`[FakePlayer] #fakeResume error: ${err}`);
@@ -189,8 +190,9 @@ protected async doGetDuration(): Promise<number> {
 
     this.seekOffset = position;
     this.timer.stop().clear();
+    this.#resetPoller();
     this.#resetTimeout();
-
+    
     try {
       const info = await this.videoLoader.getInfo(video);
       if (!info) throw new Error(`Failed to retrieve info for ${video.id}`);
@@ -222,6 +224,7 @@ protected async doGetDuration(): Promise<number> {
       this.timer.start();
       this.duration = duration;
       this.#startTimeout(this.duration - this.seekOffset);
+      this.#startPoller(1);
       return true;
     }catch (err) {
       this.logger.error(`[FakePlayer] #fakePlay error: ${err}`);
@@ -281,16 +284,23 @@ protected async doGetDuration(): Promise<number> {
       this.timeout = null;
     }
   }
-
+  #resetPoller(){
+    if(this.poller){
+      clearTimeout(this.poller);
+      this.poller = null;
+    }
+  }
   #startTimeout(duration: number) {
     this.logger.info(`[FAKEPLAYER] ||| timeout set for: ${duration}`)
     this.#resetTimeout();
     this.timeout = setTimeout(() => {
       void (async () => {
+        this.#resetPoller();
         this.seekOffset = 0;
         this.timer.stop().clear();
         this.logger.info('[FakePlayer] Playback ended. Moving to next in list...');
         await this.next();
+        this.#startPoller(1);
       })();
     }, (duration) * 1000);
   }
@@ -301,8 +311,8 @@ protected async doGetDuration(): Promise<number> {
         void (async () => {
           this.logger.info(`[FAKEPLAYER] Polling for state ${new Date().toLocaleTimeString()}`);
           this.doGetPosition();
-          this.#startPoller(1)
-        })();
+          this.#startPoller(1);
+          })();
       }, (duration) * 1000);
   }
 
