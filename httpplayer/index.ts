@@ -48,6 +48,7 @@ class HttpPlayerRuntime {
     const receiver = this.#receiver = new YouTubeCastReceiver(player, {
       device:{
         name: name,
+        screenName: `YouTube on ${name}`
       },
       dial: { port: 8099 }, // DIAL server port
       app: { resetPlayerOnDisconnectPolicy: RESET_PLAYER_ON_DISCONNECT_POLICIES.ALL_DISCONNECTED },

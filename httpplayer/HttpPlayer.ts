@@ -1,5 +1,5 @@
 import { Timer } from 'timer-node';
-import { Player, type PlayerState, PLAYER_STATUSES, type Volume } from '../dist/index.js';
+import { Player, type PlayerState, PLAYER_STATUSES, type Volume, STATUSES } from '../dist/index.js';
 import type Video from '../dist/lib/app/Video.js';
 import VideoLoader from './VideoLoader.js';
 import { PlayerStatus } from 'yt-cast-receiver';
@@ -136,19 +136,8 @@ protected async doGetPosition(): Promise<number> {
     if (!res.ok) throw new Error(`Failed to get position: ${res.status}`);
     const data = await res.json();
     // The backend returns playback position in seconds    
-    const transport_state = data.status as SonosTransportStatus;
-    const newState = this.stateMap[transport_state.current_transport_state] || undefined;
-    this.logger.info(`[FakePlayer] doGetPositon Got ${data.position} | >> ${newState}[${transport_state.current_transport_state}]`);
+    this.logger.info(`[FakePlayer] doGetPositon Got ${data.position}`);
 
-    if(newState){
-      if (this.status !== newState) {
-        this.notifyExternalStateChange(newState as PlayerStatus)
-      }
-    }
-    else{
-      this.notifyExternalStateChange()
-    }
-    
     return data.position ?? (this.seekOffset + Math.floor(this.timer.ms() / 1000));
   } catch (err) {
     this.logger.error(`[FakePlayer] doGetPosition error: ${err}`);
@@ -171,12 +160,40 @@ protected async doGetDuration(): Promise<number> {
     return this.duration;
   }
 }
+async #doPoll(){
+  try{
+    const res = await fetch(`${this.url}/poll`);
+    if (!res.ok) throw new Error(`Failed to poll state: ${res.status}`);
+    const data = await res.json();
+    const transport_state = data.status as SonosTransportStatus;
+    const newState = this.stateMap[transport_state.current_transport_state] || undefined;
+    this.logger.info(`[FakePlayer] doPoll Got >> ${newState}[${transport_state.current_transport_state}]`);
 
+    if(newState){
+      if (this.status !== newState) {
+        this.notifyExternalStateChange(newState as PlayerStatus)
+      }else{
+        this.notifyExternalStateChange();
+      }
+    }else{
+      this.notifyExternalStateChange();
+    }
+  }catch(err) {
+    this.logger.error(`[FakePlayer] doPoll error: ${err}`);
+    this.doStop();
+    this.notifyExternalStateChange(PLAYER_STATUSES.STOPPED);
+  }
+}
   async #fakeResume() {
     try {
+      if (this.timer.isPaused()) {
+        this.timer.resume();
+      }
+      else if (this.timer.isStopped() || !this.timer.isStarted()) {
+        this.timer.start();
+      }
       const res = await fetch(`${this.url}/resume`,{method:'GET'});
       if (!res.ok) throw new Error('Resume failed');
-      this.timer.resume();
       this.#startTimeout(this.duration - this.seekOffset);
       this.#startPoller(1);
       return true;
@@ -189,7 +206,7 @@ protected async doGetDuration(): Promise<number> {
   async #fakePlay(video: Video, position: number) {
 
     this.seekOffset = position;
-    this.timer.stop().clear();
+    this.timer.stop();
     this.#resetPoller();
     this.#resetTimeout();
     
@@ -262,15 +279,20 @@ protected async doGetDuration(): Promise<number> {
 
   async #fakeSeek(position: number) {
     try {
+      this.#resetPoller();
       const res = await fetch(`${this.url}/seek?pos=${position}&state=${this.stateMap0[this.status]}`,{method:'GET'});
       if (!res.ok) throw new Error(`Seek failed: ${await res.text()}`);
-      const data = await res.json();
-      this.notifyExternalStateChange(this.stateMap[(data.status as SonosTransportStatus).current_transport_state] as PlayerStatus);
+      //const data = await res.json();
+      //this.notifyExternalStateChange(this.stateMap[(data.status as SonosTransportStatus).current_transport_state] as PlayerStatus);
       this.timer.stop().clear();
       this.seekOffset = position;
-      this.timer.start();
-      this.#resetTimeout();
-      this.#startTimeout(this.duration-position)
+      // this.timer.start();
+      // this.#resetTimeout();
+      // this.#startTimeout(this.duration-position)
+      // this.#startPoller(1);
+      if (this.status === PLAYER_STATUSES.PLAYING) {
+        return Promise.resolve(this.#fakeResume());
+      }
       return true;
     } catch (err) {
       this.logger.error(`[FakePlayer] #fakeSeek error: ${err}`);
@@ -296,6 +318,7 @@ protected async doGetDuration(): Promise<number> {
     this.timeout = setTimeout(() => {
       void (async () => {
         this.#resetPoller();
+        await this.pause()
         this.seekOffset = 0;
         this.timer.stop().clear();
         this.logger.info('[FakePlayer] Playback ended. Moving to next in list...');
@@ -310,7 +333,7 @@ protected async doGetDuration(): Promise<number> {
     this.poller = setTimeout(() => {
         void (async () => {
           this.logger.info(`[FAKEPLAYER] Polling for state ${new Date().toLocaleTimeString()}`);
-          this.doGetPosition();
+          this.#doPoll();
           this.#startPoller(1);
           })();
       }, (duration) * 1000);
