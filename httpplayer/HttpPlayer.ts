@@ -60,7 +60,6 @@ export default class HttpPlayer extends Player {
     this.port = port;
     this.url = `http://localhost:${this.port}`;
     this.poller = null;
-    this.#startPoller(1);
     // When we receive a `state` event from the super class, signalling a change
     // In player state, we emit our own `fakeState` event for `FakeDemoPlayer` to consume.
     this.on('state', this.#emitFakeState.bind(this));
@@ -160,7 +159,7 @@ protected async doGetDuration(): Promise<number> {
     return this.duration;
   }
 }
-async #doPoll(){
+async #doPoll():Promise<PlayerStatus>{
   try{
     const res = await fetch(`${this.url}/poll`);
     if (!res.ok) throw new Error(`Failed to poll state: ${res.status}`);
@@ -175,13 +174,13 @@ async #doPoll(){
       }else{
         this.notifyExternalStateChange();
       }
-    }else{
-      this.notifyExternalStateChange();
     }
+    return newState as PlayerStatus;
   }catch(err) {
     this.logger.error(`[FakePlayer] doPoll error: ${err}`);
     this.doStop();
     this.notifyExternalStateChange(PLAYER_STATUSES.STOPPED);
+    return PLAYER_STATUSES.STOPPED;
   }
 }
   async #fakeResume() {
@@ -251,7 +250,7 @@ async #doPoll(){
 
   async #fakePause() {
     try {
-      this.logger.info("[FakePlayer] Calling PAUSE endpoint ${new Date().toLocaleTimeString()}")
+      this.logger.info(`[FakePlayer] Calling PAUSE endpoint ${new Date().toLocaleTimeString()}`)
       const res = await fetch(`${this.url}/pause`,{method:'GET'});
       if (!res.ok) throw new Error('Pause failed');
       this.timer.pause();
@@ -329,12 +328,13 @@ async #doPoll(){
   }
 
   #startPoller(duration:number){
-    
+    this.logger.info(`[FAKEPLAYER] Set poller @ ${new Date().toLocaleTimeString()} to fire in ${duration} seconds`);
     this.poller = setTimeout(() => {
         void (async () => {
           this.logger.info(`[FAKEPLAYER] Polling for state ${new Date().toLocaleTimeString()}`);
-          this.#doPoll();
-          this.#startPoller(1);
+          if(await this.#doPoll() !== PLAYER_STATUSES.PLAYING){
+            this.#startPoller(1);
+          }
           })();
       }, (duration) * 1000);
   }

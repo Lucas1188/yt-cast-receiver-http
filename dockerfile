@@ -5,6 +5,6 @@ LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /app
 COPY . ./yt-cast-receiver-http
 WORKDIR /app/yt-cast-receiver-http
-RUN npm install
+RUN npm install --force
 RUN npm run build
 ENTRYPOINT ["npm", "run", "http-player"]
