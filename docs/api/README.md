@@ -1,4 +1,4 @@
-**yt-cast-receiver** • **Docs**
+**yt-cast-receiver**
 
 ***
 

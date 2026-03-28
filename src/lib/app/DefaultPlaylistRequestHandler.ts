@@ -4,6 +4,7 @@ import type Client from './Client.js';
 import type Playlist from './Playlist.js';
 import PlaylistRequestHandler, { type PlaylistPreviousNextVideos } from './PlaylistRequestHandler.js';
 import type Video from './Video.js';
+import type Sender from './Sender.js';
 
 type InnertubeEndpoint = InnertubeLib.YTNodes.NavigationEndpoint;
 
@@ -29,10 +30,14 @@ export default class DefaultPlaylistRequestHandler extends PlaylistRequestHandle
   #innertubeInitialClient: InnertubeLib.Context['client'];
   #innertubeTVClient: InnertubeLib.Context['client'];
   #innertubeMusicClient: InnertubeLib.Context['client'];
+  #getConnectedSendersFn: () => Sender[];
 
-  constructor() {
+  constructor(params: {
+    getConnectedSendersFn: () => Sender[];
+  }) {
     super();
     this.#innertube = null;
+    this.#getConnectedSendersFn = params?.getConnectedSendersFn;
   }
 
   async #init() {
@@ -116,7 +121,7 @@ export default class DefaultPlaylistRequestHandler extends PlaylistRequestHandle
     }
   }
 
-  #createInnertubeEndpoint(video: Video, noClient = false): InnertubeEndpoint {
+  #createInnertubeEndpoint(video: Video, noClient = false, noMdxContext = false): InnertubeEndpoint {
     if (!this.#innertube) {
       throw Error('DefaultPlaylistRequestHandler not initialized.');
     }
@@ -125,8 +130,17 @@ export default class DefaultPlaylistRequestHandler extends PlaylistRequestHandle
     endpoint.payload = {
       videoId: video.id,
       enableMdxAutoplay: true,
-      isMdxPlayback: true
+      isMdxPlayback: true,
     };
+    if (!noMdxContext) {
+      endpoint.payload.mdxContext = {
+        mdxReceiverContext: {
+          mdxConnectedDevices: this.#getConnectedSendersFn().map((sender) => ({
+            deviceId: sender.id
+          }))
+        }
+      }
+    }
     if (video.context?.playlistId) {
       endpoint.payload.playlistId = video.context.playlistId;
     }
@@ -222,7 +236,7 @@ export default class DefaultPlaylistRequestHandler extends PlaylistRequestHandle
     const isMusic = video.client === CLIENTS.YTMUSIC;
     this.#configureInnertubeContext(video, isMusic ? 'music' : 'initial');
 
-    const endpoint = this.#createInnertubeEndpoint(run === 1 ? video : {...video, context: undefined});
+    const endpoint = this.#createInnertubeEndpoint(run === 1 ? video : {...video, context: undefined}, false, true);
     const payload = endpoint.payload;
 
     try {
@@ -267,6 +281,7 @@ export default class DefaultPlaylistRequestHandler extends PlaylistRequestHandle
         return await this.markWatched(video, 2);
       }
 
+      console.log('playability status:', JSON.stringify(playerResponse.data?.playabilityStatus))
       throw Error('No playback tracking URL found');
 
     }

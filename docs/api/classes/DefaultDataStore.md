@@ -1,10 +1,12 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
 [yt-cast-receiver](../README.md) / DefaultDataStore
 
 # Class: DefaultDataStore
+
+Defined in: [src/lib/utils/DefaultDataStore.ts:7](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DefaultDataStore.ts#L7)
 
 Default `DataStore` implementation that uses [node-persist](https://github.com/simonlast/node-persist) to persist data.
 
@@ -14,21 +16,19 @@ Default `DataStore` implementation that uses [node-persist](https://github.com/s
 
 ## Constructors
 
-### new DefaultDataStore()
+### Constructor
 
-> **new DefaultDataStore**(): [`DefaultDataStore`](DefaultDataStore.md)
+> **new DefaultDataStore**(): `DefaultDataStore`
+
+Defined in: [src/lib/utils/DefaultDataStore.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DefaultDataStore.ts#L11)
 
 #### Returns
 
-[`DefaultDataStore`](DefaultDataStore.md)
+`DefaultDataStore`
 
 #### Overrides
 
-[`DataStore`](DataStore.md).[`constructor`](DataStore.md#constructors)
-
-#### Defined in
-
-[src/lib/utils/DefaultDataStore.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DefaultDataStore.ts#L11)
+[`DataStore`](DataStore.md).[`constructor`](DataStore.md#constructor)
 
 ## Accessors
 
@@ -38,6 +38,8 @@ Default `DataStore` implementation that uses [node-persist](https://github.com/s
 
 > **get** **logger**(): [`Logger`](../interfaces/Logger.md)
 
+Defined in: [src/lib/utils/DataStore.ts:15](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L15)
+
 ##### Returns
 
 [`Logger`](../interfaces/Logger.md)
@@ -46,49 +48,45 @@ Default `DataStore` implementation that uses [node-persist](https://github.com/s
 
 [`DataStore`](DataStore.md).[`logger`](DataStore.md#logger)
 
-#### Defined in
-
-[src/lib/utils/DataStore.ts:15](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DataStore.ts#L15)
-
 ## Methods
 
 ### clear()
 
 > **clear**(): `Promise`\<`void`\>
 
+Defined in: [src/lib/utils/DefaultDataStore.ts:37](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DefaultDataStore.ts#L37)
+
 #### Returns
 
 `Promise`\<`void`\>
-
-#### Defined in
-
-[src/lib/utils/DefaultDataStore.ts:37](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DefaultDataStore.ts#L37)
 
 ***
 
 ### get()
 
-> **get**\<`T`\>(`key`): `Promise`\<`null` \| `T`\>
+> **get**\<`T`\>(`key`): `Promise`\<`T` \| `null`\>
+
+Defined in: [src/lib/utils/DefaultDataStore.ts:27](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DefaultDataStore.ts#L27)
 
 #### Type Parameters
 
-• **T**
+##### T
+
+`T`
 
 #### Parameters
 
-• **key**: `string`
+##### key
+
+`string`
 
 #### Returns
 
-`Promise`\<`null` \| `T`\>
+`Promise`\<`T` \| `null`\>
 
 #### Overrides
 
 [`DataStore`](DataStore.md).[`get`](DataStore.md#get)
-
-#### Defined in
-
-[src/lib/utils/DefaultDataStore.ts:27](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DefaultDataStore.ts#L27)
 
 ***
 
@@ -96,15 +94,23 @@ Default `DataStore` implementation that uses [node-persist](https://github.com/s
 
 > **set**\<`T`\>(`key`, `value`): `Promise`\<`void`\>
 
+Defined in: [src/lib/utils/DefaultDataStore.ts:18](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DefaultDataStore.ts#L18)
+
 #### Type Parameters
 
-• **T**
+##### T
+
+`T`
 
 #### Parameters
 
-• **key**: `string`
+##### key
 
-• **value**: `T`
+`string`
+
+##### value
+
+`T`
 
 #### Returns
 
@@ -114,19 +120,19 @@ Default `DataStore` implementation that uses [node-persist](https://github.com/s
 
 [`DataStore`](DataStore.md).[`set`](DataStore.md#set)
 
-#### Defined in
-
-[src/lib/utils/DefaultDataStore.ts:18](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DefaultDataStore.ts#L18)
-
 ***
 
 ### setLogger()
 
 > **setLogger**(`logger`): `void`
 
+Defined in: [src/lib/utils/DataStore.ts:7](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L7)
+
 #### Parameters
 
-• **logger**: [`Logger`](../interfaces/Logger.md)
+##### logger
+
+[`Logger`](../interfaces/Logger.md)
 
 #### Returns
 
@@ -135,7 +141,3 @@ Default `DataStore` implementation that uses [node-persist](https://github.com/s
 #### Inherited from
 
 [`DataStore`](DataStore.md).[`setLogger`](DataStore.md#setlogger)
-
-#### Defined in
-
-[src/lib/utils/DataStore.ts:7](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DataStore.ts#L7)

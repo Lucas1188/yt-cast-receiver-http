@@ -1,4 +1,4 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
@@ -6,15 +6,15 @@
 
 # Interface: DialOptions
 
+Defined in: [src/lib/dial/DialServer.ts:10](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L10)
+
 ## Properties
 
 ### bindToAddresses?
 
 > `optional` **bindToAddresses**: `string`[]
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:24](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L24)
+Defined in: [src/lib/dial/DialServer.ts:24](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L24)
 
 ***
 
@@ -22,9 +22,7 @@
 
 > `optional` **bindToInterfaces**: `string`[]
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:23](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L23)
+Defined in: [src/lib/dial/DialServer.ts:23](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L23)
 
 ***
 
@@ -32,9 +30,7 @@
 
 > `optional` **corsAllowOrigins**: `boolean`
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L12)
+Defined in: [src/lib/dial/DialServer.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L12)
 
 ***
 
@@ -42,9 +38,7 @@
 
 > **friendlyName**: `string`
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:14](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L14)
+Defined in: [src/lib/dial/DialServer.ts:14](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L14)
 
 ***
 
@@ -52,9 +46,7 @@
 
 > **logger**: [`Logger`](Logger.md)
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:25](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L25)
+Defined in: [src/lib/dial/DialServer.ts:25](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L25)
 
 ***
 
@@ -62,15 +54,13 @@
 
 > `optional` **manufacturer**: `string`
 
+Defined in: [src/lib/dial/DialServer.ts:18](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L18)
+
 #### Default
 
 ```ts
 CONF_DEFAULTS.BRAND
 ```
-
-#### Defined in
-
-[src/lib/dial/DialServer.ts:18](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L18)
 
 ***
 
@@ -78,15 +68,13 @@ CONF_DEFAULTS.BRAND
 
 > `optional` **modelName**: `string`
 
+Defined in: [src/lib/dial/DialServer.ts:22](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L22)
+
 #### Default
 
 ```ts
 CONF_DEFAULTS.MODEL
 ```
-
-#### Defined in
-
-[src/lib/dial/DialServer.ts:22](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L22)
 
 ***
 
@@ -94,9 +82,7 @@ CONF_DEFAULTS.MODEL
 
 > `optional` **port**: `number`
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L11)
+Defined in: [src/lib/dial/DialServer.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L11)
 
 ***
 
@@ -104,6 +90,4 @@ CONF_DEFAULTS.MODEL
 
 > `optional` **prefix**: `string`
 
-#### Defined in
-
-[src/lib/dial/DialServer.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/dial/DialServer.ts#L13)
+Defined in: [src/lib/dial/DialServer.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/dial/DialServer.ts#L13)

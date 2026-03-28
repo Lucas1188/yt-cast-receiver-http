@@ -1,4 +1,4 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
@@ -8,7 +8,9 @@
 
 > `const` **PLAYLIST\_EVENT\_TYPES**: `object`
 
-## Type declaration
+Defined in: [src/lib/app/Playlist.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Playlist.ts#L11)
+
+## Type Declaration
 
 ### PLAYLIST\_ADDED
 
@@ -37,7 +39,3 @@
 ### VIDEO\_SELECTED
 
 > `readonly` **VIDEO\_SELECTED**: `"videoSelected"` = `'videoSelected'`
-
-## Defined in
-
-[src/lib/app/Playlist.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Playlist.ts#L11)
