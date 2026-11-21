@@ -1,4 +1,4 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
@@ -6,23 +6,25 @@
 
 # Interface: Logger
 
+Defined in: [src/lib/utils/Logger.ts:9](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/Logger.ts#L9)
+
 ## Methods
 
 ### debug()
 
 > **debug**(...`msg`): `void`
 
+Defined in: [src/lib/utils/Logger.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/Logger.ts#L13)
+
 #### Parameters
 
-• ...**msg**: `any`[]
+##### msg
+
+...`any`[]
 
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/lib/utils/Logger.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/Logger.ts#L13)
 
 ***
 
@@ -30,17 +32,17 @@
 
 > **error**(...`msg`): `void`
 
+Defined in: [src/lib/utils/Logger.ts:10](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/Logger.ts#L10)
+
 #### Parameters
 
-• ...**msg**: `any`[]
+##### msg
+
+...`any`[]
 
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/lib/utils/Logger.ts:10](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/Logger.ts#L10)
 
 ***
 
@@ -48,17 +50,17 @@
 
 > **info**(...`msg`): `void`
 
+Defined in: [src/lib/utils/Logger.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/Logger.ts#L12)
+
 #### Parameters
 
-• ...**msg**: `any`[]
+##### msg
+
+...`any`[]
 
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/lib/utils/Logger.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/Logger.ts#L12)
 
 ***
 
@@ -66,17 +68,17 @@
 
 > **setLevel**(`value`): `void`
 
+Defined in: [src/lib/utils/Logger.ts:14](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/Logger.ts#L14)
+
 #### Parameters
 
-• **value**: [`LogLevel`](../type-aliases/LogLevel.md)
+##### value
+
+[`LogLevel`](../type-aliases/LogLevel.md)
 
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/lib/utils/Logger.ts:14](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/Logger.ts#L14)
 
 ***
 
@@ -84,14 +86,14 @@
 
 > **warn**(...`msg`): `void`
 
+Defined in: [src/lib/utils/Logger.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/Logger.ts#L11)
+
 #### Parameters
 
-• ...**msg**: `any`[]
+##### msg
+
+...`any`[]
 
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/lib/utils/Logger.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/Logger.ts#L11)

@@ -1,10 +1,12 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
 [yt-cast-receiver](../README.md) / DataStore
 
-# Class: `abstract` DataStore
+# Abstract Class: DataStore
+
+Defined in: [src/lib/utils/DataStore.ts:3](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L3)
 
 ## Extended by
 
@@ -12,13 +14,13 @@
 
 ## Constructors
 
-### new DataStore()
+### Constructor
 
-> **new DataStore**(): [`DataStore`](DataStore.md)
+> **new DataStore**(): `DataStore`
 
 #### Returns
 
-[`DataStore`](DataStore.md)
+`DataStore`
 
 ## Accessors
 
@@ -28,35 +30,35 @@
 
 > **get** **logger**(): [`Logger`](../interfaces/Logger.md)
 
+Defined in: [src/lib/utils/DataStore.ts:15](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L15)
+
 ##### Returns
 
 [`Logger`](../interfaces/Logger.md)
-
-#### Defined in
-
-[src/lib/utils/DataStore.ts:15](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DataStore.ts#L15)
 
 ## Methods
 
 ### get()
 
-> `abstract` **get**\<`T`\>(`key`): `Promise`\<`null` \| `T`\>
+> `abstract` **get**\<`T`\>(`key`): `Promise`\<`T` \| `null`\>
+
+Defined in: [src/lib/utils/DataStore.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L13)
 
 #### Type Parameters
 
-• **T**
+##### T
+
+`T`
 
 #### Parameters
 
-• **key**: `string`
+##### key
+
+`string`
 
 #### Returns
 
-`Promise`\<`null` \| `T`\>
-
-#### Defined in
-
-[src/lib/utils/DataStore.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DataStore.ts#L13)
+`Promise`\<`T` \| `null`\>
 
 ***
 
@@ -64,23 +66,27 @@
 
 > `abstract` **set**\<`T`\>(`key`, `value`): `Promise`\<`void`\>
 
+Defined in: [src/lib/utils/DataStore.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L12)
+
 #### Type Parameters
 
-• **T**
+##### T
+
+`T`
 
 #### Parameters
 
-• **key**: `string`
+##### key
 
-• **value**: `T`
+`string`
+
+##### value
+
+`T`
 
 #### Returns
 
 `Promise`\<`void`\>
-
-#### Defined in
-
-[src/lib/utils/DataStore.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DataStore.ts#L12)
 
 ***
 
@@ -88,14 +94,14 @@
 
 > **setLogger**(`logger`): `void`
 
+Defined in: [src/lib/utils/DataStore.ts:7](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/utils/DataStore.ts#L7)
+
 #### Parameters
 
-• **logger**: [`Logger`](../interfaces/Logger.md)
+##### logger
+
+[`Logger`](../interfaces/Logger.md)
 
 #### Returns
 
 `void`
-
-#### Defined in
-
-[src/lib/utils/DataStore.ts:7](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/utils/DataStore.ts#L7)

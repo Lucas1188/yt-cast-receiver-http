@@ -1,4 +1,4 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
@@ -6,17 +6,17 @@
 
 # Class: Sender
 
+Defined in: [src/lib/app/Sender.ts:8](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L8)
+
 A `Sender` object holds information about a sender.
 
 ## Properties
 
 ### app
 
-> **app**: `null` \| `string`
+> **app**: `string` \| `null`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L11)
+Defined in: [src/lib/app/Sender.ts:11](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L11)
 
 ***
 
@@ -24,19 +24,15 @@ A `Sender` object holds information about a sender.
 
 > **capabilities**: `string`[]
 
-#### Defined in
-
-[src/lib/app/Sender.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L13)
+Defined in: [src/lib/app/Sender.ts:13](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L13)
 
 ***
 
 ### client
 
-> **client**: `null` \| [`Client`](../interfaces/Client.md)
+> **client**: [`Client`](../interfaces/Client.md) \| `null`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L12)
+Defined in: [src/lib/app/Sender.ts:12](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L12)
 
 ***
 
@@ -44,9 +40,7 @@ A `Sender` object holds information about a sender.
 
 > **device**: `Record`\<`string`, `any`\>
 
-#### Defined in
-
-[src/lib/app/Sender.ts:14](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L14)
+Defined in: [src/lib/app/Sender.ts:14](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L14)
 
 ***
 
@@ -54,9 +48,7 @@ A `Sender` object holds information about a sender.
 
 > **id**: `string`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:9](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L9)
+Defined in: [src/lib/app/Sender.ts:9](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L9)
 
 ***
 
@@ -64,35 +56,31 @@ A `Sender` object holds information about a sender.
 
 > **name**: `string`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:10](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L10)
+Defined in: [src/lib/app/Sender.ts:10](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L10)
 
 ***
 
 ### obfuscatedGaiaId
 
-> **obfuscatedGaiaId**: `null` \| `string`
+> **obfuscatedGaiaId**: `string` \| `null`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:19](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L19)
+Defined in: [src/lib/app/Sender.ts:19](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L19)
 
 ***
 
 ### ownerObfuscatedGaiaId
 
-> **ownerObfuscatedGaiaId**: `null` \| `string`
+> **ownerObfuscatedGaiaId**: `string` \| `null`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:20](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L20)
+Defined in: [src/lib/app/Sender.ts:20](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L20)
 
 ***
 
 ### user?
 
 > `optional` **user**: `object`
+
+Defined in: [src/lib/app/Sender.ts:15](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L15)
 
 #### name
 
@@ -102,23 +90,17 @@ A `Sender` object holds information about a sender.
 
 > **thumbnail**: `string`
 
-#### Defined in
-
-[src/lib/app/Sender.ts:15](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L15)
-
 ## Methods
 
 ### supportsAutoplay()
 
 > **supportsAutoplay**(): `boolean`
 
+Defined in: [src/lib/app/Sender.ts:61](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L61)
+
 #### Returns
 
 `boolean`
-
-#### Defined in
-
-[src/lib/app/Sender.ts:61](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L61)
 
 ***
 
@@ -126,10 +108,8 @@ A `Sender` object holds information about a sender.
 
 > **supportsMute**(): `boolean`
 
+Defined in: [src/lib/app/Sender.ts:65](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/app/Sender.ts#L65)
+
 #### Returns
 
 `boolean`
-
-#### Defined in
-
-[src/lib/app/Sender.ts:65](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/app/Sender.ts#L65)

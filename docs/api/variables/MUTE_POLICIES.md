@@ -1,4 +1,4 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
@@ -8,7 +8,9 @@
 
 > `const` **MUTE\_POLICIES**: `object`
 
-## Type declaration
+Defined in: [src/lib/Constants.ts:66](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/Constants.ts#L66)
+
+## Type Declaration
 
 ### AUTO
 
@@ -21,7 +23,3 @@
 ### ZERO\_VOLUME\_LEVEL
 
 > `readonly` **ZERO\_VOLUME\_LEVEL**: `"zeroLevel"` = `'zeroLevel'`
-
-## Defined in
-
-[src/lib/Constants.ts:66](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/Constants.ts#L66)

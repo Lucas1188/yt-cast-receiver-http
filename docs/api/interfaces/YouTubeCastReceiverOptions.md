@@ -1,10 +1,12 @@
-[**yt-cast-receiver**](../README.md) • **Docs**
+[**yt-cast-receiver**](../README.md)
 
 ***
 
 [yt-cast-receiver](../README.md) / YouTubeCastReceiverOptions
 
 # Interface: YouTubeCastReceiverOptions
+
+Defined in: [src/lib/YouTubeCastReceiver.ts:19](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L19)
 
 Options consumed by constructor of `YouTubeCastReceiver` class.
 
@@ -14,11 +16,9 @@ Options consumed by constructor of `YouTubeCastReceiver` class.
 
 > `optional` **app**: `Omit`\<[`AppOptions`](AppOptions.md), `"brand"` \| `"model"` \| `"logger"` \| `"screenName"` \| `"dataStore"`\>
 
+Defined in: [src/lib/YouTubeCastReceiver.ts:24](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L24)
+
 YouTube app options.
-
-#### Defined in
-
-[src/lib/YouTubeCastReceiver.ts:24](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/YouTubeCastReceiver.ts#L24)
 
 ***
 
@@ -26,21 +26,21 @@ YouTube app options.
 
 > `optional` **dataStore**: `false` \| [`DataStore`](../classes/DataStore.md)
 
+Defined in: [src/lib/YouTubeCastReceiver.ts:47](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L47)
+
 The `DataStore` instance used for persisting data such as session info.
 
 #### Default
 
 `DefaultDataStore` instance
 
-#### Defined in
-
-[src/lib/YouTubeCastReceiver.ts:47](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/YouTubeCastReceiver.ts#L47)
-
 ***
 
 ### device?
 
 > `optional` **device**: `object`
+
+Defined in: [src/lib/YouTubeCastReceiver.ts:26](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L26)
 
 #### brand?
 
@@ -74,21 +74,15 @@ The name shown in a sender app's Cast menu, when the receiver device was previou
 'YouTube on <device.name>''
 ```
 
-#### Defined in
-
-[src/lib/YouTubeCastReceiver.ts:26](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/YouTubeCastReceiver.ts#L26)
-
 ***
 
 ### dial?
 
 > `optional` **dial**: `Omit`\<[`DialOptions`](DialOptions.md), `"friendlyName"` \| `"manufacturer"` \| `"modelName"` \| `"logger"`\>
 
+Defined in: [src/lib/YouTubeCastReceiver.ts:21](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L21)
+
 DIAL server options.
-
-#### Defined in
-
-[src/lib/YouTubeCastReceiver.ts:21](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/YouTubeCastReceiver.ts#L21)
 
 ***
 
@@ -96,9 +90,7 @@ DIAL server options.
 
 > `optional` **logger**: [`Logger`](Logger.md)
 
-#### Defined in
-
-[src/lib/YouTubeCastReceiver.ts:50](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/YouTubeCastReceiver.ts#L50)
+Defined in: [src/lib/YouTubeCastReceiver.ts:50](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L50)
 
 ***
 
@@ -106,6 +98,4 @@ DIAL server options.
 
 > `optional` **logLevel**: [`LogLevel`](../type-aliases/LogLevel.md)
 
-#### Defined in
-
-[src/lib/YouTubeCastReceiver.ts:49](https://github.com/patrickkfkan/yt-cast-receiver/blob/e384300201bf276a725286875fe0fb4b45f5c05f/src/lib/YouTubeCastReceiver.ts#L49)
+Defined in: [src/lib/YouTubeCastReceiver.ts:49](https://github.com/patrickkfkan/yt-cast-receiver/blob/aaae6be7791dc18395321e3f4cadc8b560719cbf/src/lib/YouTubeCastReceiver.ts#L49)
