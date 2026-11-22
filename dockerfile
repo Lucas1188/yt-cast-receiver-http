@@ -6,5 +6,5 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --force --ignore-scripts
 COPY . .
-RUN npm run build
+RUN npx tsc -p tsconfig.json && npm run build
 ENTRYPOINT ["npm", "run", "http-player"]
