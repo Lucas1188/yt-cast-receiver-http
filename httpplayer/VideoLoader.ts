@@ -1,2 +1,1 @@
-﻿export { default, type VideoInfo, type ResolvedStreamInfo } from './VideoLoader.js';
-
+export { default, type VideoInfo, type ResolvedStreamInfo } from '../dist/lib/VideoLoader.js';
