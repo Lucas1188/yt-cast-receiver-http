@@ -412,7 +412,14 @@ export default class HttpPlayer extends Player {
     this.logger.info(`${LOG} Set poller @ ${new Date().toLocaleTimeString()} to fire in ${duration} seconds`);
     this.poller = setTimeout(() => {
       void (async () => {
-        this.logger.info(`${LOG} Polling for state ${new Date().toLocaleTimeString()}`);
+        if (this.playbackSocket.isConnected) {
+          // WebSocket is the primary state source. Keep the fallback timer alive
+          // but do not emit duplicate state events while the socket is healthy.
+          if (!this.ending) this.#startPoller(1);
+          return;
+        }
+
+        this.logger.info(`${LOG} Polling fallback for state ${new Date().toLocaleTimeString()}`);
         const state = await this.#doPoll();
         if (state !== PLAYER_STATUSES.PLAYING && !this.ending) {
           this.#startPoller(1);
@@ -430,7 +437,7 @@ export default class HttpPlayer extends Player {
         videoTitle: this.currentVideoTitle,
         duration: this.lastDuration || this.duration,
         position: this.lastPosition,
-        volume: await this.getVolume()
+        volume: this.volume
       });
     })();
   }

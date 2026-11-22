@@ -1,3 +1,4 @@
+import WebSocket from 'ws';
 import { PLAYER_STATUSES, type Volume } from '../dist/index.js';
 import type { TransportState } from './SonosTransport.js';
 
@@ -41,6 +42,7 @@ export class PlaybackSocket {
   #socket: WebSocket | null = null;
   #reconnectTimer: NodeJS.Timeout | null = null;
   #stopped = false;
+  #connected = false;
 
   constructor(options: Options) {
     this.#url = options.url;
@@ -48,13 +50,19 @@ export class PlaybackSocket {
     this.#onLog = options.onLog;
   }
 
+  get isConnected(): boolean {
+    return this.#connected;
+  }
+
   start() {
+    if (this.#socket || this.#reconnectTimer) return;
     this.#stopped = false;
     this.#connect();
   }
 
   stop() {
     this.#stopped = true;
+    this.#connected = false;
     if (this.#reconnectTimer) {
       clearTimeout(this.#reconnectTimer);
       this.#reconnectTimer = null;
@@ -76,7 +84,10 @@ export class PlaybackSocket {
       const socket = new WebSocket(this.#url);
       this.#socket = socket;
 
-      socket.onopen = () => this.#log(`WebSocket connected: ${this.#url}`);
+      socket.onopen = () => {
+        this.#connected = true;
+        this.#log(`WebSocket connected: ${this.#url}`);
+      };
       socket.onmessage = (event) => {
         try {
           const payload = JSON.parse(String(event.data)) as PlaybackSocketEvent;
@@ -102,6 +113,7 @@ export class PlaybackSocket {
       };
       socket.onerror = (event) => this.#log(`WebSocket error: ${String(event)}`);
       socket.onclose = () => {
+        this.#connected = false;
         this.#socket = null;
         if (!this.#stopped) this.#scheduleReconnect();
       };
