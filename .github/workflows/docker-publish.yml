@@ -1,0 +1,83 @@
+name: Build and publish Docker image
+
+on:
+  push:
+    branches: [master, merge-upstream, range_fix]
+    paths:
+      - 'dockerfile'
+      - '.dockerignore'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'src/**'
+      - 'httpplayer/**'
+      - 'tsconfig.json'
+      - '.github/workflows/docker-publish.yml'
+  schedule:
+    - cron: '17 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force dependency refresh and no-cache image build'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ghcr-yt-cast-receiver-http-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && 'master' || github.ref }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine forced rebuild
+        id: rebuild
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.force_rebuild }}" = "true" ]; then
+            echo "forced=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "forced=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Refresh npm dependencies for forced rebuild
+        if: steps.rebuild.outputs.forced == 'true'
+        run: npm install --force --ignore-scripts
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ghcr.io/lucas1188/yt-cast-receiver-http
+          tags: |
+            type=raw,value=dotnet
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.event_name == 'schedule' }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./dockerfile
+          push: true
+          no-cache: ${{ steps.rebuild.outputs.forced == 'true' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

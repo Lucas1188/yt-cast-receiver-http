@@ -6,6 +6,7 @@ import type Logger from '../utils/Logger.js';
 import { DialServerError } from '../utils/Errors.js';
 import { CONF_DEFAULTS, STATUSES } from '../Constants.js';
 import { type ValueOf } from '../utils/Type.js';
+import { StreamMetadataApi } from '../../../httpplayer/StreamMetadataApi.js';
 
 export interface DialOptions {
   port?: number;
@@ -85,6 +86,8 @@ export default class DialServer {
     this.#logger = options.logger;
 
     const expressApp = express();
+    expressApp.use(express.json());
+    expressApp.use(new StreamMetadataApi().middleware());
     this.#dialOptions = {
       expressApp,
       port: options.port || 3000,

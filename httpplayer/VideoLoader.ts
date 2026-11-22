@@ -9,9 +9,18 @@ interface BasicInfo {
   album?: string;
 }
 
+export interface ResolvedStreamInfo {
+  url: string;
+  contentLength?: number;
+  bitrate?: number;
+  mimeType?: string;
+  itag?: number;
+}
+
 export interface VideoInfo extends BasicInfo {
   duration: number;
   streamUrl?: any;
+  stream?: ResolvedStreamInfo;
 }
 
 /**
@@ -52,35 +61,45 @@ if (allowArbitraryCodeExecution) {
   }
 }
 
-async function getStreamUrl(innertube: Innertube, videoInfo: InnertubeLib.YT.VideoInfo) {
+async function getStream(innertube: Innertube, videoInfo: InnertubeLib.YT.VideoInfo): Promise<ResolvedStreamInfo | null> {
   if (!allowArbitraryCodeExecution) {
     return null;
   }
-  let streamUrl;
   if (videoInfo.basic_info.is_live) {
-    streamUrl = videoInfo.streaming_data?.hls_manifest_url ||
-      videoInfo.streaming_data?.dash_manifest_url ||
-      null;
+    const url = videoInfo.streaming_data?.hls_manifest_url ||
+      videoInfo.streaming_data?.dash_manifest_url;
+    return url ? { url } : null;
   }
-  else {
-    // Fetch stream URL with `chooseFormat()`:
-    const allFormats = [
-      ...videoInfo.streaming_data?.formats || [],
-      ...videoInfo.streaming_data?.adaptive_formats || []
-    ];
-    const hasAudioFormat = allFormats.some((f) => f.has_audio) ? 'audio' : false;
-    const hasVideoFormat = allFormats.some((f) => f.has_video) ? 'video' : false;
-    const hasAudioAndVideoFormat = allFormats.some((f) => f.has_audio && f.has_video) ? 'video+audio' : false;
-    const formatType = hasAudioAndVideoFormat || hasVideoFormat || hasAudioFormat || undefined;
+
+  try {
+    const format = videoInfo.chooseFormat({ type: 'audio', format: 'any', quality: 'best' });
+    const url = await format.decipher(innertube.session.player);
+    if (!url) return null;
+    return {
+      url,
+      contentLength: format.content_length,
+      bitrate: format.bitrate,
+      mimeType: format.mime_type,
+      itag: format.itag
+    };
+  }
+  catch (_error: unknown) {
     try {
-      const format = videoInfo?.chooseFormat({ type: formatType, quality: 'best' });
-      streamUrl = format ? await format.decipher(innertube.session.player) : null;
+      const format = videoInfo.chooseFormat({ quality: 'best' });
+      const url = await format.decipher(innertube.session.player);
+      if (!url) return null;
+      return {
+        url,
+        contentLength: format.content_length,
+        bitrate: format.bitrate,
+        mimeType: format.mime_type,
+        itag: format.itag
+      };
     }
-    catch (_error: unknown) {
-      streamUrl = null;
+    catch (_fallbackError: unknown) {
+      return null;
     }
   }
-  return streamUrl;
 }
 
 export default class VideoLoader {
@@ -108,7 +127,7 @@ export default class VideoLoader {
     }
   }
 
-  async getInfo(video: Video): Promise<VideoInfo | null> {
+  async getInfo(video: Video, options?: { minimal?: boolean }): Promise<VideoInfo | null> {
     if (!this.#innertube) {
       await this.#init();
     }
@@ -160,58 +179,60 @@ export default class VideoLoader {
       delete (this.#innertube.session.context.user as any)?.credentialTransferTokens;
     }
 
-    // There are two endpoints we need to fetch data from:
-    // 1. '/next': for metadata (title, channel for video, artist / album for music...)
-    // 2. '/player': for streaming data
-
-    const nextResponse = await this.#innertube.actions.execute('/next', payload) as any;
-
     let basicInfo: BasicInfo | null = null;
 
-    // We cannot use innertube to parse `nextResponse`, because it doesn't
-    // Have `SingleColumnWatchNextResults` parser class. We would have to do it ourselves.
+    if (!options?.minimal) {
+      // '/next' supplies richer metadata (title, channel, artist / album).
+      const nextResponse = await this.#innertube.actions.execute('/next', payload) as any;
 
-    const singleColumnContents = nextResponse.data?.contents?.singleColumnWatchNextResults?.
-      results?.results?.contents?.[0]?.itemSectionRenderer?.contents?.[0];
+      // We cannot use innertube to parse `nextResponse`, because it doesn't
+      // Have `SingleColumnWatchNextResults` parser class. We would have to do it ourselves.
+      const singleColumnContents = nextResponse.data?.contents?.singleColumnWatchNextResults?.
+        results?.results?.contents?.[0]?.itemSectionRenderer?.contents?.[0];
 
-    const videoMetadata = singleColumnContents?.videoMetadataRenderer;
-    const songMetadata = singleColumnContents?.musicWatchMetadataRenderer;
+      const videoMetadata = singleColumnContents?.videoMetadataRenderer;
+      const songMetadata = singleColumnContents?.musicWatchMetadataRenderer;
 
-    if (videoMetadata) {
+      if (videoMetadata) {
+        basicInfo = {
+          src: 'yt',
+          title: new InnertubeLib.Misc.Text(videoMetadata.title).toString(),
+          channel: new InnertubeLib.Misc.Text(videoMetadata.owner?.videoOwnerRenderer?.title).toString()
+        };
+      }
+      else if (songMetadata) {
+        basicInfo = {
+          src: 'ytmusic',
+          title: new InnertubeLib.Misc.Text(songMetadata.title).toString(),
+          artist: new InnertubeLib.Misc.Text(songMetadata.byline).toString(),
+          album: new InnertubeLib.Misc.Text(songMetadata.albumName).toString()
+        };
+      }
+    }
+
+    // Fetch response from '/player' endpoint.
+    // But first revert to initial client in innertube context, otherwise livestreams will only have DASH manifest URL
+    // - we would like to fetch complete streaming data.
+    this.#innertube.session.context.client = { ...this.#innertubeInitialClient };
+    const playerResponse = await this.#innertube.actions.execute('/player', payload) as any;
+
+    // Wrap it in innertube VideoInfo. Why? Because it offers many useful methods like `chooseFormat()`.
+    const innertubeVideoInfo = new InnertubeLib.YT.VideoInfo([ playerResponse ], this.#innertube.actions, cpn);
+    const stream = await getStream(this.#innertube, innertubeVideoInfo);
+
+    if (!basicInfo) {
       basicInfo = {
         src: 'yt',
-        title: new InnertubeLib.Misc.Text(videoMetadata.title).toString(),
-        channel: new InnertubeLib.Misc.Text(videoMetadata.owner?.videoOwnerRenderer?.title).toString()
-      };
-    }
-    else if (songMetadata) {
-      basicInfo = {
-        src: 'ytmusic',
-        title: new InnertubeLib.Misc.Text(songMetadata.title).toString(),
-        artist: new InnertubeLib.Misc.Text(songMetadata.byline).toString(),
-        album: new InnertubeLib.Misc.Text(songMetadata.albumName).toString()
+        title: innertubeVideoInfo.basic_info.title || video.id,
+        channel: innertubeVideoInfo.basic_info.author
       };
     }
 
-    if (basicInfo) {
-      // Fetch response from '/player' endpoint.
-      // But first revert to initial client in innertube context, otherwise livestreams will only have DASH manifest URL
-      // - we would like to fetch complete streaming data.
-      this.#innertube.session.context.client = { ...this.#innertubeInitialClient };
-      const playerResponse = await this.#innertube.actions.execute('/player', payload) as any;
-
-      // Wrap it in innertube VideoInfo. Why? Because it offers many useful methods like `chooseFormat()`.
-      const innertubeVideoInfo = new InnertubeLib.YT.VideoInfo([ playerResponse ], this.#innertube.actions, cpn);
-
-      const result = {
-        ...basicInfo,
-        duration: innertubeVideoInfo.basic_info.duration || 0,
-        streamUrl: await getStreamUrl(this.#innertube, innertubeVideoInfo)
-      } as VideoInfo;
-
-      return result;
-    }
-
-    return null;
+    return {
+      ...basicInfo,
+      duration: innertubeVideoInfo.basic_info.duration || 0,
+      streamUrl: stream?.url,
+      stream: stream ?? undefined
+    } as VideoInfo;
   }
 }

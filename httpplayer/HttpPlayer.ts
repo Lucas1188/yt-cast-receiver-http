@@ -224,6 +224,18 @@ async #doPoll():Promise<PlayerStatus>{
         artist: String(info.artist || ""),
         album: String(info.album || "")
       });
+
+      const nextVideo = this.queue.getState().next;
+      if (nextVideo && nextVideo.id !== video.id) {
+        params.set('nextVideoId', String(nextVideo.id));
+        params.set('nextTitle', String(nextVideo.id));
+        params.set('nextDuration', '0');
+        params.set('nextSrc', String(nextVideo.client === 'YTMUSIC' ? 'ytmusic' : 'yt'));
+        if (nextVideo.context?.playlistId) params.set('nextPlaylistId', String(nextVideo.context.playlistId));
+        if (nextVideo.context?.params) params.set('nextParams', String(nextVideo.context.params));
+        if (nextVideo.context?.index !== undefined) params.set('nextIndex', String(nextVideo.context.index));
+        if (nextVideo.context?.ctt) params.set('nextCtt', String(nextVideo.context.ctt));
+      }
       
       const res = await fetch(`${this.url}/start?${params.toString()}`, {
         method: 'GET'
@@ -312,19 +324,40 @@ async #doPoll():Promise<PlayerStatus>{
     }
   }
   #startTimeout(duration: number) {
-    this.logger.info(`[FAKEPLAYER] ||| timeout set for: ${duration}`)
+    if (!Number.isFinite(duration) || duration <= 0) {
+      this.logger.warn(`[FAKEPLAYER] Skipping end timer for invalid duration: ${duration}`);
+      return;
+    }
+
+    const timeoutSeconds = duration + 5;
+    this.logger.info(`[FAKEPLAYER] ||| timeout set for: ${timeoutSeconds}`)
     this.#resetTimeout();
     this.timeout = setTimeout(() => {
       void (async () => {
+        try {
+          const sonosPosition = await this.doGetPosition();
+          const sonosDuration = await this.doGetDuration();
+          const remaining = sonosDuration - sonosPosition;
+
+          if (remaining > 5) {
+            this.logger.info(`[FakePlayer] Timeout fired early; Sonos reports ${remaining}s remaining. Extending timer.`);
+            this.#startTimeout(remaining);
+            this.#startPoller(1);
+            return;
+          }
+        }
+        catch (err) {
+          this.logger.warn(`[FakePlayer] Could not verify Sonos position at timeout: ${err}`);
+        }
+
         this.#resetPoller();
-        await this.pause()
+        await this.pause();
         this.seekOffset = 0;
         this.timer.stop().clear();
         this.logger.info('[FakePlayer] Playback ended. Moving to next in list...');
         await this.next();
-        this.#startPoller(1);
       })();
-    }, (duration) * 1000);
+    }, timeoutSeconds * 1000);
   }
 
   #startPoller(duration:number){
