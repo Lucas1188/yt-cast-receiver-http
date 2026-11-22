@@ -6,7 +6,7 @@ import type Logger from '../utils/Logger.js';
 import { DialServerError } from '../utils/Errors.js';
 import { CONF_DEFAULTS, STATUSES } from '../Constants.js';
 import { type ValueOf } from '../utils/Type.js';
-import { StreamMetadataApi } from '../../../httpplayer/StreamMetadataApi.js';
+import { StreamMetadataApi } from '../StreamMetadataApi.js';
 
 export interface DialOptions {
   port?: number;
